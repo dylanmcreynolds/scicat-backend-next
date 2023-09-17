@@ -1,4 +1,4 @@
-import { ExecutionContext, Injectable } from "@nestjs/common";
+import { ExecutionContext, Injectable, Logger } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 
 @Injectable()
@@ -11,8 +11,10 @@ export class OidcAuthGuard extends AuthGuard("oidc") {
   getRequest(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     if (!request.headers["cookie"]){
+      Logger.warn("No cookies found. This indicates that the express session is not configured. Have you set EXPRESS_SESSION_SECRET environment variable?")
       return request;
     }
+    
     const cookie: string = request.headers["cookie"]
       .split(";")
       .find((c: string) => c.startsWith("connect.sid="));
